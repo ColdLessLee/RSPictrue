@@ -1,4 +1,11 @@
-# RspictureCore
+# RSPictrue
+
+![Swift](https://img.shields.io/badge/Swift-5.8+-orange.svg)
+![iOS](https://img.shields.io/badge/iOS-14.0+-blue.svg)
+![Platform](https://img.shields.io/badge/platform-iOS-lightgrey.svg)
+![SPM](https://img.shields.io/badge/SPM-compatible-green.svg)
+![CocoaPods](https://img.shields.io/badge/CocoaPods-compatible-red.svg)
+![License](https://img.shields.io/badge/license-MIT-brightgreen.svg)
 
 一个高性能的Swift图像相似性检测Package，专为iOS应用设计，利用GPU并行运算提供批量多图片比对功能。
 
@@ -7,7 +14,7 @@
 - **GPU加速处理**: 利用Metal框架进行并行运算，大幅提升处理性能
 - **多算法融合**: 结合颜色直方图、ORB特征和PHash算法，提供精确的相似性检测
 - **智能批处理**: 自动优化批次大小，支持增量处理大量图片
-- **单例模式管理**: 统一的接口设计，内置缓存和线程安全机制
+- **模块化设计**: 三个独立模块，支持按需引入
 - **流式输出**: 实时进度报告，支持流式结果输出
 - **内存优化**: 智能内存管理，适配不同设备性能
 - **线程安全**: 基于GCD的多线程设计，不阻塞主线程
@@ -26,105 +33,110 @@
 在Xcode中添加Package依赖：
 
 ```
-https://github.com/yourname/RspictureCore.git
+https://github.com/yourname/rspictrue.git
 ```
 
 或在Package.swift中添加：
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/yourname/RspictureCore.git", from: "1.0.0")
+    .package(url: "https://github.com/yourname/rspictrue.git", from: "1.0.0")
 ]
 ```
 
-## 🔧 基本使用
-
-### 1. 导入框架
+**模块化引入：**
 
 ```swift
-import RspictureCore
-import Photos
+// 完整功能
+.product(name: "RSP", package: "rspictrue")
+
+// 仅核心图像处理
+.product(name: "RspictureCore", package: "rspictrue")
+
+// 仅资源管理服务
+.product(name: "AssetsService", package: "rspictrue")
 ```
 
-### 2. 请求相册权限
+### CocoaPods
 
-```swift
-PHPhotoLibrary.requestAuthorization { status in
-    if status == .authorized {
-        // 开始处理图片
-    }
-}
+在Podfile中添加：
+
+```ruby
+# 完整安装（默认包含RSP模块）
+pod 'RSPictrue'
+
+# 或者模块化安装
+pod 'RSPictrue/Core'          # 核心图像处理模块
+pod 'RSPictrue/AssetsService' # 资源管理服务模块
+pod 'RSPictrue/RSP'           # 统一接口模块（依赖前两个）
+
+# 组合安装
+pod 'RSPictrue', :subspecs => ['Core', 'AssetsService']
 ```
 
-### 3. 获取图片资源
+然后执行：
 
-```swift
-let fetchOptions = PHFetchOptions()
-fetchOptions.predicate = NSPredicate(format: "mediaType == %d", PHAssetMediaType.image.rawValue)
-let fetchResult = PHAsset.fetchAssets(with: fetchOptions)
-
-var assets: [PHAsset] = []
-fetchResult.enumerateObjects { asset, _, _ in
-    assets.append(asset)
-}
+```bash
+pod install
 ```
 
-### 4. 配置和启动扫描
+## 🏗️ 模块说明
 
-```swift
-class YourViewController: UIViewController, RspictureDelegate {
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        setupRspicture()
-    }
-    
-    private func setupRspicture() {
-        let manager = RspictureManager.shared
-        manager.setDelegate(self)
-        
-        // 可选：自定义配置
-        let config = RspictureConfiguration(
-            maxBatchSize: 50,
-            memoryBudget: 100 * 1024 * 1024, // 100MB
-            similarityThreshold: 0.8,
-            useIncrementalProcessing: true,
-            cacheSize: 50
-        )
-        manager.configure(with: config)
-    }
-    
-    private func startScanning(assets: [PHAsset]) {
-        RspictureManager.shared.findSimilarImages(from: assets)
-    }
-    
-    // MARK: - RspictureDelegate
-    
-    func rspictureDidUpdateProgress(_ result: SimilarityResult) {
-        // 更新进度UI
-        let progress = result.progress.percentage
-        let groups = result.similarGroups
-        
-        DispatchQueue.main.async {
-            // 更新进度条和结果显示
-        }
-    }
-    
-    func rspictureDidComplete(_ finalResult: SimilarityResult) {
-        // 处理最终结果
-        let similarGroups = finalResult.similarGroups
-        
-        DispatchQueue.main.async {
-            // 显示完成状态和结果
-        }
-    }
-    
-    func rspictureDidEncounterError(_ error: Error) {
-        // 处理错误
-        print("扫描出错: \(error.localizedDescription)")
-    }
-}
-```
+### RspictureCore
+核心图像处理模块，包含：
+- Metal GPU加速的图像相似性算法
+- 颜色直方图、ORB特征、PHash算法
+- 批处理和内存管理
+- 线程安全的处理引擎
+
+### AssetsService  
+相册资源管理模块，提供：
+- PHAsset扩展和工具方法
+- 图片加载和缓存管理
+- 相册权限处理
+- 资源分析和统计
+
+### RSP
+统一静态接口模块，特点：
+- 简化的API设计
+- 单例模式管理
+- 集成所有功能模块
+- 便于快速集成
+
+## 📊 算法详解
+
+### 颜色直方图算法
+- 计算RGB三通道各256个bin的直方图
+- 使用Bhattacharyya系数进行相似性比较
+- 权重占比：30%
+
+### ORB特征算法
+- 检测图像关键点和二进制描述符
+- 支持500个特征点，每个32字节描述符
+- 使用汉明距离计算相似性
+- 权重占比：50%
+
+### PHash算法
+- 64位感知哈希，基于DCT变换
+- 通过汉明距离计算相似性
+- 权重占比：20%
+
+## 🎯 性能优化
+
+### GPU加速
+- 利用Metal compute shader进行并行计算
+- 支持同时处理多张图片的特征提取
+- 相似性矩阵计算完全在GPU上完成
+
+### 内存管理
+- 智能缓存机制，支持LRU淘汰策略
+- 根据设备内存动态调整批次大小
+- 及时释放不需要的图像数据
+
+### 线程优化
+- 主线程不被阻塞，所有计算在后台进行
+- 使用GCD进行任务调度和并发控制
+- 结果通过delegate在主线程回调
 
 ## 🔄 高级功能
 
@@ -202,41 +214,6 @@ RspictureLogger.logLevel = .info
 RspictureLogger.log("开始处理图片", level: .info)
 ```
 
-## 📊 算法详解
-
-### 颜色直方图算法
-- 计算RGB三通道各256个bin的直方图
-- 使用Bhattacharyya系数进行相似性比较
-- 权重占比：30%
-
-### ORB特征算法
-- 检测图像关键点和二进制描述符
-- 支持500个特征点，每个32字节描述符
-- 使用汉明距离计算相似性
-- 权重占比：50%
-
-### PHash算法
-- 64位感知哈希，基于DCT变换
-- 通过汉明距离计算相似性
-- 权重占比：20%
-
-## 🎯 性能优化
-
-### GPU加速
-- 利用Metal compute shader进行并行计算
-- 支持同时处理多张图片的特征提取
-- 相似性矩阵计算完全在GPU上完成
-
-### 内存管理
-- 智能缓存机制，支持LRU淘汰策略
-- 根据设备内存动态调整批次大小
-- 及时释放不需要的图像数据
-
-### 线程优化
-- 主线程不被阻塞，所有计算在后台进行
-- 使用GCD进行任务调度和并发控制
-- 结果通过delegate在主线程回调
-
 ## ⚠️ 注意事项
 
 1. **相册权限**: 必须获得相册访问权限才能使用
@@ -268,5 +245,104 @@ A: 确保设备支持Metal，检查着色器文件是否正确包含。
 - `imageProcessingFailed`: 图像处理失败
 - `cacheError`: 缓存操作失败
 
+## 🔧 基本使用
+
+### 1. 导入框架
+
+```swift
+// 使用统一接口（推荐）
+import RSP
+
+// 或者按需导入模块
+import RspictureCore
+import AssetsService
+import Photos
+```
+
+### 2. 请求相册权限
+
+```swift
+PHPhotoLibrary.requestAuthorization { status in
+    if status == .authorized || status == .limited {
+        // 开始处理图片
+    }
+}
+```
+
+### 3. 获取图片资源
+
+```swift
+let fetchOptions = PHFetchOptions()
+fetchOptions.predicate = NSPredicate(format: "mediaType == %d", PHAssetMediaType.image.rawValue)
+let fetchResult = PHAsset.fetchAssets(with: fetchOptions)
+
+var assets: [PHAsset] = []
+fetchResult.enumerateObjects { asset, _, _ in
+    assets.append(asset)
+}
+```
+
+### 4. 配置和启动扫描
+
+```swift
+class YourViewController: UIViewController, RspictureDelegate {
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setupRspicture()
+    }
+    
+    private func setupRspicture() {
+        let manager = RspictureManager.shared
+        manager.setDelegate(self)
+        
+        // 可选：自定义配置
+        let config = RspictureConfiguration(
+            maxBatchSize: 50,
+            memoryBudget: 100 * 1024 * 1024, // 100MB
+            similarityThreshold: 0.8,
+            useIncrementalProcessing: true,
+            cacheSize: 50
+        )
+        manager.configure(with: config)
+    }
+    
+    private func startScanning(assets: [PHAsset]) {
+        RspictureManager.shared.findSimilarImages(from: assets)
+    }
+    
+    // MARK: - RspictureDelegate
+    
+    func rspictureDidUpdateProgress(_ result: SimilarityResult) {
+        // 更新进度UI
+        let progress = result.progress.percentage
+        let groups = result.similarGroups
+        
+        DispatchQueue.main.async {
+            // 更新进度条和结果显示
+        }
+    }
+    
+    func rspictureDidComplete(_ finalResult: SimilarityResult) {
+        // 处理最终结果
+        let similarGroups = finalResult.similarGroups
+        
+        DispatchQueue.main.async {
+            // 显示完成状态和结果
+        }
+    }
+    
+    func rspictureDidEncounterError(_ error: Error) {
+        // 处理错误
+        print("扫描出错: \(error.localizedDescription)")
+    }
+}
+```
+
+## 📄 开源协议
+
+MIT License - 详见 [LICENSE](LICENSE) 文件
+
+---
 
 *本Package专为iOS平台优化，充分利用了Metal框架的GPU加速能力，为大规模图像相似性检测提供了高效的解决方案。* 
