@@ -4,7 +4,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "RspictureCore",
+    name: "RSPictrue",
     platforms: [
         .iOS(.v14)
     ],

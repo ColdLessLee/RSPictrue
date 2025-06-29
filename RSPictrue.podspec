@@ -12,14 +12,14 @@ Pod::Spec.new do |spec|
                        - RSP: Unified static interface for easy access to all functionality
                        DESC
 
-  spec.homepage      = "https://github.com/your-username/rspictrue"
+  spec.homepage      = "https://github.com/ColdLessLee/RSPictrue"
   spec.license       = { :type => "MIT", :file => "LICENSE" }
-  spec.author        = { "Your Name" => "your.email@example.com" }
+  spec.author        = { "ColdLessLee" => "leezway@foxmail.com" }
 
   spec.ios.deployment_target = "14.0"
   spec.swift_version = "5.8"
 
-  spec.source        = { :git => "https://github.com/your-username/rspictrue.git", :tag => "#{spec.version}" }
+  spec.source        = { :git => "https://github.com/ColdLessLee/RSPictrue.git", :tag => "#{spec.version}" }
   spec.source_files  = "Sources/**/*.swift"
   spec.resources     = "Sources/RspictureCore/Metal/**/*.metal"
   
@@ -62,5 +62,5 @@ Pod::Spec.new do |spec|
   spec.exclude_files = "Tests/**/*", "Examples/**/*"
   
   # Documentation
-  spec.documentation_url = "https://github.com/your-username/rspictrue/blob/main/README.md"
+  spec.documentation_url = "https://github.com/ColdLessLee/RSPictrue/blob/master/README.md"
 end 

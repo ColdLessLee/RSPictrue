@@ -33,14 +33,14 @@
 在Xcode中添加Package依赖：
 
 ```
-https://github.com/yourname/rspictrue.git
+https://github.com/ColdLessLee/RSPictrue.git
 ```
 
 或在Package.swift中添加：
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/yourname/rspictrue.git", from: "1.0.0")
+    .package(url: "https://github.com/ColdLessLee/RSPictrue.git", from: "1.0.0")
 ]
 ```
 
@@ -48,13 +48,13 @@ dependencies: [
 
 ```swift
 // 完整功能
-.product(name: "RSP", package: "rspictrue")
+.product(name: "RSP", package: "RSPictrue")
 
 // 仅核心图像处理
-.product(name: "RspictureCore", package: "rspictrue")
+.product(name: "RspictureCore", package: "RSPictrue")
 
 // 仅资源管理服务
-.product(name: "AssetsService", package: "rspictrue")
+.product(name: "AssetsService", package: "RSPictrue")
 ```
 
 ### CocoaPods
