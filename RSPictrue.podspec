@@ -1,9 +1,9 @@
 Pod::Spec.new do |spec|
-  spec.name          = "RspictureCore"
+  spec.name          = "RSPictrue"
   spec.version       = "1.0.0"
   spec.summary       = "A powerful Swift package for image similarity detection and asset management"
   spec.description   = <<-DESC
-                       RspictureCore is a comprehensive Swift package that provides advanced image similarity 
+                       RSPictrue is a comprehensive Swift package that provides advanced image similarity 
                        detection using Metal performance shaders, along with powerful photo library asset 
                        management capabilities. The package includes three main components:
                        
@@ -38,14 +38,14 @@ Pod::Spec.new do |spec|
   
   spec.subspec 'AssetsService' do |assets|
     assets.source_files = "Sources/AssetsService/**/*.swift"
-    assets.dependency "RspictureCore/Core"
+    assets.dependency "RSPictrue/Core"
     assets.frameworks = "Foundation", "Photos", "UIKit", "AVFoundation"
   end
   
   spec.subspec 'RSP' do |rsp|
     rsp.source_files = "Sources/RSP/**/*.swift"
-    rsp.dependency "RspictureCore/Core"
-    rsp.dependency "RspictureCore/AssetsService"
+    rsp.dependency "RSPictrue/Core"
+    rsp.dependency "RSPictrue/AssetsService"
     rsp.frameworks = "Foundation", "Photos", "UIKit"
   end
   
