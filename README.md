@@ -1,4 +1,4 @@
-# RSPictrue
+# RSPicture
 
 ![Swift](https://img.shields.io/badge/Swift-5.8+-orange.svg)
 ![iOS](https://img.shields.io/badge/iOS-14.0+-blue.svg)
@@ -33,14 +33,14 @@
 在Xcode中添加Package依赖：
 
 ```
-https://github.com/ColdLessLee/RSPictrue.git
+https://github.com/ColdLessLee/RSPicture.git
 ```
 
 或在Package.swift中添加：
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/ColdLessLee/RSPictrue.git", from: "1.0.0")
+    .package(url: "https://github.com/ColdLessLee/RSPicture.git", from: "1.0.0")
 ]
 ```
 
@@ -48,13 +48,13 @@ dependencies: [
 
 ```swift
 // 完整功能
-.product(name: "RSP", package: "RSPictrue")
+.product(name: "RSP", package: "RSPicture")
 
 // 仅核心图像处理
-.product(name: "RspictureCore", package: "RSPictrue")
+.product(name: "RSPictureCore", package: "RSPicture")
 
 // 仅资源管理服务
-.product(name: "AssetsService", package: "RSPictrue")
+.product(name: "AssetsService", package: "RSPicture")
 ```
 
 ### CocoaPods
@@ -63,15 +63,15 @@ dependencies: [
 
 ```ruby
 # 完整安装（默认包含RSP模块）
-pod 'RSPictrue'
+pod 'RSPicture'
 
 # 或者模块化安装
-pod 'RSPictrue/Core'          # 核心图像处理模块
-pod 'RSPictrue/AssetsService' # 资源管理服务模块
-pod 'RSPictrue/RSP'           # 统一接口模块（依赖前两个）
+pod 'RSPicture/Core'          # 核心图像处理模块
+pod 'RSPicture/AssetsService' # 资源管理服务模块
+pod 'RSPicture/RSP'           # 统一接口模块（依赖前两个）
 
 # 组合安装
-pod 'RSPictrue', :subspecs => ['Core', 'AssetsService']
+pod 'RSPicture', :subspecs => ['Core', 'AssetsService']
 ```
 
 然后执行：
@@ -82,7 +82,7 @@ pod install
 
 ## 🏗️ 模块说明
 
-### RspictureCore
+### RSPictureCore
 核心图像处理模块，包含：
 - Metal GPU加速的图像相似性算法
 - 颜色直方图、ORB特征、PHash算法
@@ -145,7 +145,7 @@ pod install
 对于大量图片（>500张），系统自动启用增量处理：
 
 ```swift
-let manager = RspictureManager.shared
+let manager = RSPictureManager.shared
 
 // 检查是否建议增量处理
 if manager.shouldProcessIncrementally(assetCount: assets.count) {
@@ -154,19 +154,19 @@ if manager.shouldProcessIncrementally(assetCount: assets.count) {
 
 // 预估处理时间
 let estimatedTime = manager.estimateProcessingTime(for: assets)
-print("预估处理时间: \(RspictureUtils.formatTimeEstimate(estimatedTime))")
+print("预估处理时间: \(RSPictureUtils.formatTimeEstimate(estimatedTime))")
 ```
 
 ### 设备能力检测
 
 ```swift
 // 检查Metal支持
-if RspictureUtils.isMetalAvailable {
+if RSPictureUtils.isMetalAvailable {
     print("设备支持Metal加速")
 }
 
 // 获取内存信息
-let memoryInfo = RspictureUtils.deviceMemoryInfo
+let memoryInfo = RSPictureUtils.deviceMemoryInfo
 print("设备内存: \(memoryInfo.totalMemoryMB)MB")
 if memoryInfo.isMemoryConstrained {
     print("设备内存受限，将使用优化策略")
@@ -192,7 +192,7 @@ print("总像素数: \(totalPixels)")
 ### 自定义配置
 
 ```swift
-let customConfig = RspictureConfiguration(
+let customConfig = RSPictureConfiguration(
     maxBatchSize: 30,                    // 较小批次，适合低性能设备
     memoryBudget: 50 * 1024 * 1024,     // 50MB内存限制
     similarityThreshold: 0.85,           // 更严格的相似性阈值
@@ -200,18 +200,18 @@ let customConfig = RspictureConfiguration(
     cacheSize: 30                        // 30MB缓存
 )
 
-RspictureManager.shared.configure(with: customConfig)
+RSPictureManager.shared.configure(with: customConfig)
 ```
 
 ### 日志和调试
 
 ```swift
 // 启用日志
-RspictureLogger.isEnabled = true
-RspictureLogger.logLevel = .info
+RSPictureLogger.isEnabled = true
+RSPictureLogger.logLevel = .info
 
 // 手动记录日志
-RspictureLogger.log("开始处理图片", level: .info)
+RSPictureLogger.log("开始处理图片", level: .info)
 ```
 
 ## ⚠️ 注意事项
@@ -254,7 +254,7 @@ A: 确保设备支持Metal，检查着色器文件是否正确包含。
 import RSP
 
 // 或者按需导入模块
-import RspictureCore
+import RSPictureCore
 import AssetsService
 import Photos
 ```
@@ -285,19 +285,19 @@ fetchResult.enumerateObjects { asset, _, _ in
 ### 4. 配置和启动扫描
 
 ```swift
-class YourViewController: UIViewController, RspictureDelegate {
+class YourViewController: UIViewController, RSPictureDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupRspicture()
+        setupRSPicture()
     }
     
-    private func setupRspicture() {
-        let manager = RspictureManager.shared
+    private func setupRSPicture() {
+        let manager = RSPictureManager.shared
         manager.setDelegate(self)
         
         // 可选：自定义配置
-        let config = RspictureConfiguration(
+        let config = RSPictureConfiguration(
             maxBatchSize: 50,
             memoryBudget: 100 * 1024 * 1024, // 100MB
             similarityThreshold: 0.8,
@@ -308,10 +308,10 @@ class YourViewController: UIViewController, RspictureDelegate {
     }
     
     private func startScanning(assets: [PHAsset]) {
-        RspictureManager.shared.findSimilarImages(from: assets)
+        RSPictureManager.shared.findSimilarImages(from: assets)
     }
     
-    // MARK: - RspictureDelegate
+    // MARK: - RSPictureDelegate
     
     func rspictureDidUpdateProgress(_ result: SimilarityResult) {
         // 更新进度UI

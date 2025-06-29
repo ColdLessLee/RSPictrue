@@ -12,7 +12,7 @@ class RSPUsageExample {
     func setupExample() {
         // 1. 初始化RSP系统
         let config = RSP.Config(
-            coreConfiguration: RspictureConfiguration(
+            coreConfiguration: RSPictureConfiguration(
                 maxBatchSize: 100,
                 similarityThreshold: 0.85,
                 useIncrementalProcessing: true
@@ -168,25 +168,25 @@ class RSPUsageExample {
     }
     
     // MARK: - Progress Delegate Example
-    class ProgressDelegate: RspictureDelegate {
-        func rspictureDidStart(_ manager: RspictureManager) {
+    class ProgressDelegate: RSPictureDelegate {
+        func rspictureDidStart(_ manager: RSPictureManager) {
             print("扫描开始")
         }
         
-        func rspicture(_ manager: RspictureManager, didUpdateProgress progress: ScanProgress) {
+        func rspicture(_ manager: RSPictureManager, didUpdateProgress progress: ScanProgress) {
             let formatted = RSP.formatProgress(progress)
             print("扫描进度更新: \(formatted)")
         }
         
-        func rspicture(_ manager: RspictureManager, didFindSimilarGroup group: SimilarityResult) {
+        func rspicture(_ manager: RSPictureManager, didFindSimilarGroup group: SimilarityResult) {
             print("发现相似组: \(group.assets.count) 张图片")
         }
         
-        func rspictureDidComplete(_ manager: RspictureManager, results: [SimilarityResult]) {
+        func rspictureDidComplete(_ manager: RSPictureManager, results: [SimilarityResult]) {
             print("扫描完成，共找到 \(results.count) 组相似图片")
         }
         
-        func rspicture(_ manager: RspictureManager, didFailWithError error: Error) {
+        func rspicture(_ manager: RSPictureManager, didFailWithError error: Error) {
             print("扫描失败: \(error)")
         }
     }

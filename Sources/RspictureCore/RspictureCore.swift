@@ -6,20 +6,20 @@ import Photos
 @_exported import Photos
 
 // Export main manager
-public typealias RspictureManager = RspictureCore.RspictureManager
+public typealias RSPictureManager = RSPictureCore.RSPictureManager
 
 // Export delegate protocol
-public typealias RspictureDelegate = RspictureCore.RspictureDelegate
+public typealias RSPictureDelegate = RSPictureCore.RSPictureDelegate
 
 // Export result types
-public typealias ScanProgress = RspictureCore.ScanProgress
-public typealias SimilarityResult = RspictureCore.SimilarityResult
+public typealias ScanProgress = RSPictureCore.ScanProgress
+public typealias SimilarityResult = RSPictureCore.SimilarityResult
 
 // Export error types
-public typealias RspictureError = RspictureCore.RspictureError
+public typealias RSPictureError = RSPictureCore.RSPictureError
 
 // MARK: - Configuration
-public struct RspictureConfiguration {
+public struct RSPictureConfiguration {
     /// Maximum number of assets to process in a single batch
     public let maxBatchSize: Int
     
@@ -47,13 +47,13 @@ public struct RspictureConfiguration {
         self.cacheSize = cacheSize
     }
     
-    public static let `default` = RspictureConfiguration()
+    public static let `default` = RSPictureConfiguration()
 }
 
 // MARK: - Convenience Extensions
-public extension RspictureManager {
+public extension RSPictureManager {
     /// Configure the manager with custom settings
-    func configure(with configuration: RspictureConfiguration) {
+    func configure(with configuration: RSPictureConfiguration) {
         // Implementation would be added to configure internal components
         // For now, this is a placeholder for future configuration options
     }
@@ -108,7 +108,7 @@ public extension Array where Element == PHAsset {
 }
 
 // MARK: - Utility Functions
-public struct RspictureUtils {
+public struct RSPictureUtils {
     /// Check if Metal is available on the current device
     public static var isMetalAvailable: Bool {
         return MTLCreateSystemDefaultDevice() != nil
@@ -155,7 +155,7 @@ public struct DeviceMemoryInfo {
 }
 
 // MARK: - Debugging and Logging
-public struct RspictureLogger {
+public struct RSPictureLogger {
     public enum LogLevel {
         case debug, info, warning, error
     }

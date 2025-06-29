@@ -1,12 +1,12 @@
 import UIKit
 import Photos
-import RspictureCore
+import RSPictureCore
 
 // MARK: - Basic Usage Example
 class ImageSimilarityViewController: UIViewController {
     
     // MARK: - Properties
-    private let rspictureManager = RspictureManager.shared
+    private let rspictureManager = RSPictureManager.shared
     private var allAssets: [PHAsset] = []
     private var similarGroups: [[PHAsset]] = []
     
@@ -45,7 +45,7 @@ class ImageSimilarityViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        setupRspicture()
+        setupRSPicture()
         requestPhotoAccess()
     }
     
@@ -65,12 +65,12 @@ class ImageSimilarityViewController: UIViewController {
         resultsTableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
     }
     
-    private func setupRspicture() {
+    private func setupRSPicture() {
         // 设置delegate
         rspictureManager.setDelegate(self)
         
         // 可选：配置参数
-        let configuration = RspictureConfiguration(
+        let configuration = RSPictureConfiguration(
             maxBatchSize: 50,
             memoryBudget: 100 * 1024 * 1024, // 100MB
             similarityThreshold: 0.8,
@@ -80,8 +80,8 @@ class ImageSimilarityViewController: UIViewController {
         rspictureManager.configure(with: configuration)
         
         // 启用日志（可选）
-        RspictureLogger.isEnabled = true
-        RspictureLogger.logLevel = .info
+        RSPictureLogger.isEnabled = true
+        RSPictureLogger.logLevel = .info
     }
     
     // MARK: - Photo Access
@@ -134,7 +134,7 @@ class ImageSimilarityViewController: UIViewController {
         
         // 显示预估时间
         let estimatedTime = rspictureManager.estimateProcessingTime(for: allAssets)
-        let timeString = RspictureUtils.formatTimeEstimate(estimatedTime)
+        let timeString = RSPictureUtils.formatTimeEstimate(estimatedTime)
         
         let alert = UIAlertController(
             title: "开始扫描",
@@ -199,21 +199,21 @@ class ImageSimilarityViewController: UIViewController {
     }
 }
 
-// MARK: - RspictureDelegate
-extension ImageSimilarityViewController: RspictureDelegate {
+// MARK: - RSPictureDelegate
+extension ImageSimilarityViewController: RSPictureDelegate {
     func rspictureDidUpdateProgress(_ result: SimilarityResult) {
         // 更新进度条
         progressView.progress = result.progress.percentage
         
         // 更新状态文本
-        let progressText = RspictureUtils.formatProgress(result.progress)
+        let progressText = RSPictureUtils.formatProgress(result.progress)
         statusLabel.text = "扫描中... \(progressText)"
         
         // 更新结果（流式输出）
         similarGroups = result.similarGroups
         resultsTableView.reloadData()
         
-        RspictureLogger.log("Progress update: \(progressText), Found \(result.similarGroups.count) groups", level: .info)
+        RSPictureLogger.log("Progress update: \(progressText), Found \(result.similarGroups.count) groups", level: .info)
     }
     
     func rspictureDidComplete(_ finalResult: SimilarityResult) {
@@ -229,7 +229,7 @@ extension ImageSimilarityViewController: RspictureDelegate {
         
         statusLabel.text = "扫描完成！找到 \(totalGroups) 组相似图片，共 \(totalSimilarImages) 张"
         
-        RspictureLogger.log("Scan completed: \(totalGroups) groups, \(totalSimilarImages) similar images", level: .info)
+        RSPictureLogger.log("Scan completed: \(totalGroups) groups, \(totalSimilarImages) similar images", level: .info)
         
         // 显示完成提示
         if totalGroups > 0 {
@@ -247,7 +247,7 @@ extension ImageSimilarityViewController: RspictureDelegate {
         updateUIForScanComplete()
         statusLabel.text = "扫描出错：\(error.localizedDescription)"
         
-        RspictureLogger.log("Scan error: \(error.localizedDescription)", level: .error)
+        RSPictureLogger.log("Scan error: \(error.localizedDescription)", level: .error)
         
         let alert = UIAlertController(
             title: "扫描失败",
@@ -310,14 +310,14 @@ extension ImageSimilarityViewController: UITableViewDataSource, UITableViewDeleg
 
 // MARK: - Advanced Usage Example
 class AdvancedImageSimilarityManager {
-    private let rspictureManager = RspictureManager.shared
+    private let rspictureManager = RSPictureManager.shared
     private var processedAssets = Set<String>()
     
     func performIncrementalScan(newAssets: [PHAsset]) {
         // 检查设备能力
-        let memoryInfo = RspictureUtils.deviceMemoryInfo
+        let memoryInfo = RSPictureUtils.deviceMemoryInfo
         if memoryInfo.isMemoryConstrained {
-            RspictureLogger.log("Device is memory constrained, using smaller batches", level: .warning)
+            RSPictureLogger.log("Device is memory constrained, using smaller batches", level: .warning)
         }
         
         // 只处理新增的资产
@@ -326,11 +326,11 @@ class AdvancedImageSimilarityManager {
         }
         
         guard !unprocessedAssets.isEmpty else {
-            RspictureLogger.log("No new assets to process", level: .info)
+            RSPictureLogger.log("No new assets to process", level: .info)
             return
         }
         
-        RspictureLogger.log("Starting incremental scan for \(unprocessedAssets.count) assets", level: .info)
+        RSPictureLogger.log("Starting incremental scan for \(unprocessedAssets.count) assets", level: .info)
         rspictureManager.findSimilarImages(from: unprocessedAssets)
     }
     
@@ -338,11 +338,11 @@ class AdvancedImageSimilarityManager {
         let highResAssets = assets.highResolutionAssets
         let totalPixels = assets.totalPixels
         
-        RspictureLogger.log("Asset analysis: \(assets.count) total, \(highResAssets.count) high-res, \(totalPixels) total pixels", level: .info)
+        RSPictureLogger.log("Asset analysis: \(assets.count) total, \(highResAssets.count) high-res, \(totalPixels) total pixels", level: .info)
         
         // 根据资产复杂度调整处理策略
         if highResAssets.count > assets.count / 2 {
-            RspictureLogger.log("High percentage of high-res assets, consider using smaller batches", level: .warning)
+            RSPictureLogger.log("High percentage of high-res assets, consider using smaller batches", level: .warning)
         }
     }
 } 

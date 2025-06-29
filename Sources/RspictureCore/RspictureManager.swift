@@ -23,17 +23,17 @@ public struct SimilarityResult {
 }
 
 // MARK: - Delegate Protocol
-public protocol RspictureDelegate: AnyObject {
+public protocol RSPictureDelegate: AnyObject {
     func rspictureDidUpdateProgress(_ result: SimilarityResult)
     func rspictureDidComplete(_ finalResult: SimilarityResult)
     func rspictureDidEncounterError(_ error: Error)
 }
 
 // MARK: - Main Manager Class
-public final class RspictureManager {
+public final class RSPictureManager {
     
     // MARK: - Singleton
-    public static let shared = RspictureManager()
+    public static let shared = RSPictureManager()
     
     // MARK: - Properties
     private let metalProcessor: MetalImageProcessor
@@ -45,7 +45,7 @@ public final class RspictureManager {
     private let concurrentQueue = DispatchQueue(label: "com.rspicture.concurrent", qos: .userInitiated, attributes: .concurrent)
     
     // State management with GCD serial queue
-    private var _currentDelegate: RspictureDelegate?
+    private var _currentDelegate: RSPictureDelegate?
     private var _isProcessing = false
     private let stateQueue = DispatchQueue(label: "com.rspicture.state", qos: .userInitiated)
     
@@ -67,13 +67,13 @@ public final class RspictureManager {
     }
     
     // MARK: - Public Interface
-    public func setDelegate(_ delegate: RspictureDelegate?) {
+    public func setDelegate(_ delegate: RSPictureDelegate?) {
         stateQueue.sync {
             _currentDelegate = delegate
         }
     }
     
-    public var delegate: RspictureDelegate? {
+    public var delegate: RSPictureDelegate? {
         return stateQueue.sync {
             return _currentDelegate
         }
@@ -106,7 +106,7 @@ public final class RspictureManager {
         
         guard shouldStartProcessing else {
             notifyDelegate { delegate in
-                delegate.rspictureDidEncounterError(RspictureError.alreadyProcessing)
+                delegate.rspictureDidEncounterError(RSPictureError.alreadyProcessing)
             }
             return
         }
@@ -143,7 +143,7 @@ public final class RspictureManager {
         histogramCache.totalCostLimit = 10 * 1024 * 1024 // 10MB
     }
     
-    private func notifyDelegate(_ block: @escaping (RspictureDelegate) -> Void) {
+    private func notifyDelegate(_ block: @escaping (RSPictureDelegate) -> Void) {
         let currentDelegate = stateQueue.sync { _currentDelegate }
         guard let delegate = currentDelegate else { return }
         

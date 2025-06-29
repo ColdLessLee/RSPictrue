@@ -1,27 +1,27 @@
 Pod::Spec.new do |spec|
-  spec.name          = "RSPictrue"
+  spec.name          = "RSPicture"
   spec.version       = "1.0.0"
   spec.summary       = "A powerful Swift package for image similarity detection and asset management"
   spec.description   = <<-DESC
-                       RSPictrue is a comprehensive Swift package that provides advanced image similarity 
+                       RSPicture is a comprehensive Swift package that provides advanced image similarity 
                        detection using Metal performance shaders, along with powerful photo library asset 
                        management capabilities. The package includes three main components:
                        
-                       - RspictureCore: Core image processing and similarity detection
+                       - RSPictureCore: Core image processing and similarity detection
                        - AssetsService: Photo library asset management and operations
                        - RSP: Unified static interface for easy access to all functionality
                        DESC
 
-  spec.homepage      = "https://github.com/ColdLessLee/RSPictrue"
+  spec.homepage      = "https://github.com/ColdLessLee/RSPicture"
   spec.license       = { :type => "MIT", :file => "LICENSE" }
   spec.author        = { "ColdLessLee" => "leezway@foxmail.com" }
 
   spec.ios.deployment_target = "14.0"
   spec.swift_version = "5.8"
 
-  spec.source        = { :git => "https://github.com/ColdLessLee/RSPictrue.git", :tag => "#{spec.version}" }
+  spec.source        = { :git => "https://github.com/ColdLessLee/RSPicture.git", :tag => "#{spec.version}" }
   spec.source_files  = "Sources/**/*.swift"
-  spec.resources     = "Sources/RspictureCore/Metal/**/*.metal"
+  spec.resources     = "Sources/RSPictureCore/Metal/**/*.metal"
   
   # Framework dependencies
   spec.frameworks    = "Foundation", "Photos", "UIKit", "Metal", "MetalKit", "AVFoundation"
@@ -31,21 +31,21 @@ Pod::Spec.new do |spec|
   
   # Subspecs for individual components
   spec.subspec 'Core' do |core|
-    core.source_files = "Sources/RspictureCore/**/*.swift"
-    core.resources    = "Sources/RspictureCore/Metal/**/*.metal"
+    core.source_files = "Sources/RSPictureCore/**/*.swift"
+    core.resources    = "Sources/RSPictureCore/Metal/**/*.metal"
     core.frameworks   = "Foundation", "Photos", "UIKit", "Metal", "MetalKit"
   end
   
   spec.subspec 'AssetsService' do |assets|
     assets.source_files = "Sources/AssetsService/**/*.swift"
-    assets.dependency "RSPictrue/Core"
+    assets.dependency "RSPicture/Core"
     assets.frameworks = "Foundation", "Photos", "UIKit", "AVFoundation"
   end
   
   spec.subspec 'RSP' do |rsp|
     rsp.source_files = "Sources/RSP/**/*.swift"
-    rsp.dependency "RSPictrue/Core"
-    rsp.dependency "RSPictrue/AssetsService"
+    rsp.dependency "RSPicture/Core"
+    rsp.dependency "RSPicture/AssetsService"
     rsp.frameworks = "Foundation", "Photos", "UIKit"
   end
   
@@ -62,5 +62,5 @@ Pod::Spec.new do |spec|
   spec.exclude_files = "Tests/**/*", "Examples/**/*"
   
   # Documentation
-  spec.documentation_url = "https://github.com/ColdLessLee/RSPictrue/blob/master/README.md"
+  spec.documentation_url = "https://github.com/ColdLessLee/RSPicture/blob/master/README.md"
 end 

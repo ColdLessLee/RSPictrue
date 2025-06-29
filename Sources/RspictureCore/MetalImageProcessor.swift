@@ -108,7 +108,7 @@ final class MetalImageProcessor {
         let matrixSize = batchSize * batchSize
         
         guard let buffer = device.makeBuffer(length: matrixSize * MemoryLayout<Float>.size, options: .storageModeShared) else {
-            throw RspictureError.metalNotSupported
+            throw RSPictureError.metalNotSupported
         }
         
         // Prepare feature data for GPU
@@ -190,7 +190,7 @@ final class MetalImageProcessor {
         semaphore.wait()
         
         guard let data = imageData else {
-            throw RspictureError.imageProcessingFailed
+            throw RSPictureError.imageProcessingFailed
         }
         
         return data
@@ -199,7 +199,7 @@ final class MetalImageProcessor {
     private func extractFeaturesFromImageData(_ imageData: Data, assetIdentifier: String) throws -> ImageFeatures {
         // Create CIImage from data
         guard let ciImage = CIImage(data: imageData) else {
-            throw RspictureError.imageProcessingFailed
+            throw RSPictureError.imageProcessingFailed
         }
         
         // Resize for consistent processing
@@ -207,7 +207,7 @@ final class MetalImageProcessor {
         
         // Create Metal texture
         guard let texture = try createMetalTexture(from: resizedImage) else {
-            throw RspictureError.metalNotSupported
+            throw RSPictureError.metalNotSupported
         }
         
         // Extract features using Metal compute shaders
@@ -235,7 +235,7 @@ final class MetalImageProcessor {
         descriptor.usage = [.shaderRead, .shaderWrite]
         
         guard let texture = device.makeTexture(descriptor: descriptor) else {
-            throw RspictureError.metalNotSupported
+            throw RSPictureError.metalNotSupported
         }
         
         // Render CIImage to Metal texture
@@ -247,13 +247,13 @@ final class MetalImageProcessor {
     private func computeColorHistogram(texture: MTLTexture) throws -> [Float] {
         guard let commandBuffer = commandQueue.makeCommandBuffer(),
               let computeEncoder = commandBuffer.makeComputeCommandEncoder() else {
-            throw RspictureError.metalNotSupported
+            throw RSPictureError.metalNotSupported
         }
         
         // Create output buffer for histogram (RGB channels * 256 bins each)
         let histogramSize = 256 * 3 * MemoryLayout<Float>.size
         guard let histogramBuffer = device.makeBuffer(length: histogramSize, options: .storageModeShared) else {
-            throw RspictureError.metalNotSupported
+            throw RSPictureError.metalNotSupported
         }
         
         // Configure compute encoder
@@ -283,13 +283,13 @@ final class MetalImageProcessor {
     private func computeORBFeatures(texture: MTLTexture) throws -> [Float] {
         guard let commandBuffer = commandQueue.makeCommandBuffer(),
               let computeEncoder = commandBuffer.makeComputeCommandEncoder() else {
-            throw RspictureError.metalNotSupported
+            throw RSPictureError.metalNotSupported
         }
         
         // Create output buffer for ORB features (500 features * 32 bytes each)
         let orbSize = 500 * 32 * MemoryLayout<Float>.size
         guard let orbBuffer = device.makeBuffer(length: orbSize, options: .storageModeShared) else {
-            throw RspictureError.metalNotSupported
+            throw RSPictureError.metalNotSupported
         }
         
         // Configure compute encoder
@@ -319,12 +319,12 @@ final class MetalImageProcessor {
     private func computePHash(texture: MTLTexture) throws -> UInt64 {
         guard let commandBuffer = commandQueue.makeCommandBuffer(),
               let computeEncoder = commandBuffer.makeComputeCommandEncoder() else {
-            throw RspictureError.metalNotSupported
+            throw RSPictureError.metalNotSupported
         }
         
         // Create output buffer for PHash
         guard let pHashBuffer = device.makeBuffer(length: MemoryLayout<UInt64>.size, options: .storageModeShared) else {
-            throw RspictureError.metalNotSupported
+            throw RSPictureError.metalNotSupported
         }
         
         // Configure compute encoder
@@ -357,7 +357,7 @@ final class MetalImageProcessor {
         let totalSize = batchSize * featureSize * MemoryLayout<Float>.size
         
         guard let buffer = device.makeBuffer(length: totalSize, options: .storageModeShared) else {
-            throw RspictureError.metalNotSupported
+            throw RSPictureError.metalNotSupported
         }
         
         let bufferPointer = buffer.contents().bindMemory(to: Float.self, capacity: batchSize * featureSize)
@@ -387,7 +387,7 @@ final class MetalImageProcessor {
     private func executeSimilarityCalculation(featureData: MTLBuffer, outputBuffer: MTLBuffer, batchSize: Int) throws {
         guard let commandBuffer = commandQueue.makeCommandBuffer(),
               let computeEncoder = commandBuffer.makeComputeCommandEncoder() else {
-            throw RspictureError.metalNotSupported
+            throw RSPictureError.metalNotSupported
         }
         
         // Configure compute encoder

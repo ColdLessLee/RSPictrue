@@ -1,6 +1,6 @@
 import UIKit
 import Photos
-import RspictureCore
+import RSPictureCore
 import AssetsService
 
 // 这个示例展示如何正确处理Kingfisher的可选依赖

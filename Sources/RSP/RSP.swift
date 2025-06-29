@@ -1,21 +1,21 @@
 import Foundation
 import Photos
 import UIKit
-import RspictureCore
+import RSPictureCore
 import AssetsService
 
 // MARK: - RSP Main Class
-/// RSP - 统一的静态封装类，提供对RspictureCore和AssetsService的访问
+/// RSP - 统一的静态封装类，提供对RSPictureCore和AssetsService的访问
 public final class RSP {
     
     // MARK: - Configuration
     public struct Config {
-        public let coreConfiguration: RspictureConfiguration
+        public let coreConfiguration: RSPictureConfiguration
         public let enableKingfisherCache: Bool
         public let enableLogging: Bool
         
         public init(
-            coreConfiguration: RspictureConfiguration = .default,
+            coreConfiguration: RSPictureConfiguration = .default,
             enableKingfisherCache: Bool = true,
             enableLogging: Bool = false
         ) {
@@ -29,7 +29,7 @@ public final class RSP {
     
     // MARK: - Internal State
     private static var _configuration: Config = .default
-    private static var _coreManager: RspictureManager?
+    private static var _coreManager: RSPictureManager?
     private static var _assetsService: RSPAssetsService {
         return RSPAssetsService.shared
     }
@@ -40,11 +40,11 @@ public final class RSP {
     /// - Parameter config: 配置参数
     public static func initialize(with config: Config = .default) {
         _configuration = config
-        _coreManager = RspictureManager()
+        _coreManager = RSPictureManager()
         _coreManager?.configure(with: config.coreConfiguration)
         
         // 配置日志系统
-        RspictureLogger.isEnabled = config.enableLogging
+        RSPictureLogger.isEnabled = config.enableLogging
     }
     
     /// 获取当前配置
@@ -61,10 +61,10 @@ public final class RSP {
     /// - Returns: 相似图片结果
     public static func scanSimilarImages(
         from assets: [PHAsset],
-        delegate: RspictureDelegate? = nil
+        delegate: RSPictureDelegate? = nil
     ) async throws -> [SimilarityResult] {
         guard let manager = _coreManager else {
-            throw RspictureError.notInitialized
+            throw RSPictureError.notInitialized
         }
         
         return try await withCheckedThrowingContinuation { continuation in
@@ -85,7 +85,7 @@ public final class RSP {
     public static func batchProcessImages(_ assets: [PHAsset]) -> AsyncThrowingStream<ScanProgress, Error> {
         guard let manager = _coreManager else {
             return AsyncThrowingStream { continuation in
-                continuation.finish(throwing: RspictureError.notInitialized)
+                continuation.finish(throwing: RSPictureError.notInitialized)
             }
         }
         
@@ -232,26 +232,26 @@ public final class RSP {
     
     /// 检查Metal是否可用
     public static var isMetalAvailable: Bool {
-        return RspictureUtils.isMetalAvailable
+        return RSPictureUtils.isMetalAvailable
     }
     
     /// 获取设备内存信息
     public static var deviceMemoryInfo: DeviceMemoryInfo {
-        return RspictureUtils.deviceMemoryInfo
+        return RSPictureUtils.deviceMemoryInfo
     }
     
     /// 格式化进度信息
     /// - Parameter progress: 扫描进度
     /// - Returns: 格式化的进度字符串
     public static func formatProgress(_ progress: ScanProgress) -> String {
-        return RspictureUtils.formatProgress(progress)
+        return RSPictureUtils.formatProgress(progress)
     }
     
     /// 格式化时间估算
     /// - Parameter seconds: 秒数
     /// - Returns: 格式化的时间字符串
     public static func formatTimeEstimate(_ seconds: TimeInterval) -> String {
-        return RspictureUtils.formatTimeEstimate(seconds)
+        return RSPictureUtils.formatTimeEstimate(seconds)
     }
     
     /// 检查是否应该使用增量处理
@@ -270,20 +270,20 @@ public final class RSP {
     /// - Parameters:
     ///   - message: 日志消息
     ///   - level: 日志级别
-    public static func log(_ message: String, level: RspictureLogger.LogLevel = .info) {
-        RspictureLogger.log(message, level: level)
+    public static func log(_ message: String, level: RSPictureLogger.LogLevel = .info) {
+        RSPictureLogger.log(message, level: level)
     }
     
     /// 启用/禁用日志
     /// - Parameter enabled: 是否启用
     public static func setLoggingEnabled(_ enabled: Bool) {
-        RspictureLogger.isEnabled = enabled
+        RSPictureLogger.isEnabled = enabled
     }
     
     /// 设置日志级别
     /// - Parameter level: 日志级别
-    public static func setLogLevel(_ level: RspictureLogger.LogLevel) {
-        RspictureLogger.logLevel = level
+    public static func setLogLevel(_ level: RSPictureLogger.LogLevel) {
+        RSPictureLogger.logLevel = level
     }
 }
 
@@ -294,7 +294,7 @@ public extension RSP {
     /// 快速扫描所有图片的相似性
     /// - Parameter delegate: 进度代理
     /// - Returns: 相似图片结果
-    static func scanAllImages(delegate: RspictureDelegate? = nil) async throws -> [SimilarityResult] {
+    static func scanAllImages(delegate: RSPictureDelegate? = nil) async throws -> [SimilarityResult] {
         let assets = try await fetchAllAssets(for: .image)
         return try await scanSimilarImages(from: assets, delegate: delegate)
     }
@@ -316,6 +316,6 @@ public extension RSP {
 }
 
 // MARK: - Error Extension
-extension RspictureError {
-    static let notInitialized = RspictureError.invalidConfiguration
+extension RSPictureError {
+    static let notInitialized = RSPictureError.invalidConfiguration
 } 

@@ -4,14 +4,14 @@
 import PackageDescription
 
 let package = Package(
-    name: "RSPictrue",
+    name: "RSPicture",
     platforms: [
         .iOS(.v14)
     ],
     products: [
         .library(
-            name: "RspictureCore",
-            targets: ["RspictureCore"]),
+            name: "RSPictureCore",
+            targets: ["RSPictureCore"]),
         .library(
             name: "AssetsService",
             targets: ["AssetsService"]),
@@ -24,7 +24,7 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "RspictureCore",
+            name: "RSPictureCore",
             dependencies: [],
             resources: [
                 .process("Metal")
@@ -32,14 +32,14 @@ let package = Package(
         ),
         .target(
             name: "AssetsService",
-            dependencies: ["RspictureCore"]
+            dependencies: ["RSPictureCore"]
         ),
         .target(
             name: "RSP",
-            dependencies: ["RspictureCore", "AssetsService"]
+            dependencies: ["RSPictureCore", "AssetsService"]
         ),
         .testTarget(
-            name: "RspictureCoreTests",
-            dependencies: ["RspictureCore"])
+            name: "RSPictureCoreTests",
+            dependencies: ["RSPictureCore"])
     ]
 ) 

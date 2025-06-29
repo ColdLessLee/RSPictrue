@@ -1,6 +1,6 @@
 import UIKit
 import Photos
-import RspictureCore
+import RSPictureCore
 
 // MARK: - Assets Service Usage Example
 class AssetsServiceViewController: UIViewController {

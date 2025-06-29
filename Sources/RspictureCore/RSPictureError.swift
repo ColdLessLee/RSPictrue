@@ -1,7 +1,7 @@
 import Foundation
 
 // MARK: - Error Types
-public enum RspictureError: LocalizedError {
+public enum RSPictureError: LocalizedError {
     case alreadyProcessing
     case metalNotSupported
     case imageProcessingFailed

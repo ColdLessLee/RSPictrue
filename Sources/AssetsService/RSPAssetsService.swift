@@ -2,7 +2,7 @@ import Foundation
 import Photos
 import UIKit
 import AVFoundation
-import RspictureCore
+import RSPictureCore
 
 #if canImport(Kingfisher)
 import Kingfisher
@@ -123,7 +123,7 @@ public final class RSPAssetsService {
         checkPhotosPermission { [weak self] authorized in
             guard authorized else {
                 let callback = self?.useMainQueueCalling(completion) ?? completion
-                callback(.failure(RspictureError.photosAccessDenied))
+                callback(.failure(RSPictureError.photosAccessDenied))
                 return
             }
             
@@ -157,7 +157,7 @@ public final class RSPAssetsService {
     ) {
         guard offset >= 0, limit > 0 else {
             let callback = useMainQueueCalling(completion)
-            callback(.failure(RspictureError.invalidOffset))
+            callback(.failure(RSPictureError.invalidOffset))
             return
         }
         
@@ -223,7 +223,7 @@ public final class RSPAssetsService {
         checkPhotosPermission { [weak self] authorized in
             guard authorized else {
                 let callback = self?.useMainQueueCalling(completion) ?? completion
-                callback(.failure(RspictureError.photosAccessDenied))
+                callback(.failure(RSPictureError.photosAccessDenied))
                 return
             }
             
@@ -314,7 +314,7 @@ public final class RSPAssetsService {
         default:
             guard let phMediaType = mediaType.phAssetMediaType else {
                 let callback = useMainQueueCalling(completion)
-                callback(.failure(RspictureError.assetNotFound))
+                callback(.failure(RSPictureError.assetNotFound))
                 return
             }
             fetchResult = PHAsset.fetchAssets(with: phMediaType, options: fetchOptions)
@@ -355,7 +355,7 @@ public final class RSPAssetsService {
         let foundIds = Set(successfulIds)
         for id in ids {
             if !foundIds.contains(id) {
-                failedIds[id] = RspictureError.assetNotFound
+                failedIds[id] = RSPictureError.assetNotFound
             }
         }
         
@@ -385,7 +385,7 @@ public final class RSPAssetsService {
             let result = RSPBatchOperationResult(
                 successfulIds: [],
                 failedIds: ids.reduce(into: [:]) { dict, id in
-                    dict[id] = RspictureError.assetNotFound
+                    dict[id] = RSPictureError.assetNotFound
                 },
                 totalProcessed: ids.count
             )
@@ -408,7 +408,7 @@ public final class RSPAssetsService {
                 )
             } else {
                 let failedIds = ids.reduce(into: [:]) { dict, id in
-                    dict[id] = error ?? RspictureError.batchOperationFailed
+                    dict[id] = error ?? RSPictureError.batchOperationFailed
                 }
                 result = RSPBatchOperationResult(
                     successfulIds: [],
@@ -430,7 +430,7 @@ public final class RSPAssetsService {
         checkPhotosPermission { [weak self] authorized in
             guard authorized else {
                 let callback = self?.useMainQueueCalling(completion) ?? completion
-                callback(.failure(RspictureError.photosAccessDenied))
+                callback(.failure(RSPictureError.photosAccessDenied))
                 return
             }
             
@@ -459,7 +459,7 @@ public final class RSPAssetsService {
                         )
                     } else {
                         let failedIds = ids.reduce(into: [:]) { dict, id in
-                            dict[id] = error ?? RspictureError.batchOperationFailed
+                            dict[id] = error ?? RSPictureError.batchOperationFailed
                         }
                         result = RSPBatchOperationResult(
                             successfulIds: [],
@@ -495,7 +495,7 @@ public final class RSPAssetsService {
             } else if let image = image {
                 callback(.success(image))
             } else {
-                callback(.failure(RspictureError.imageLoadingFailed))
+                callback(.failure(RSPictureError.imageLoadingFailed))
             }
         }
     }
