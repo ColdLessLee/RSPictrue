@@ -1,8 +1,9 @@
 #include <metal_stdlib>
 using namespace metal;
 
-// Constants
-constant int HISTOGRAM_BINS = 256;
+// Constants - 保持与Swift代码一致
+constant int HISTOGRAM_BINS = 256;  // 每个颜色通道的直方图bins数量
+constant int HISTOGRAM_SIZE = HISTOGRAM_BINS * 3;  // RGB三通道总直方图大小 (768)
 constant int ORB_FEATURE_COUNT = 500;
 constant int ORB_DESCRIPTOR_SIZE = 32;
 
@@ -20,13 +21,13 @@ kernel void compute_color_histogram(texture2d<float, access::read> inputTexture 
     uint g = uint(color.g * 255.0);
     uint b = uint(color.b * 255.0);
     
-    r = min(r, 255u);
-    g = min(g, 255u);
-    b = min(b, 255u);
+    r = min(r, uint(HISTOGRAM_BINS - 1));
+    g = min(g, uint(HISTOGRAM_BINS - 1));
+    b = min(b, uint(HISTOGRAM_BINS - 1));
     
     atomic_fetch_add_explicit((device atomic_uint*)&histogram[r], 1, memory_order_relaxed);
-    atomic_fetch_add_explicit((device atomic_uint*)&histogram[256 + g], 1, memory_order_relaxed);
-    atomic_fetch_add_explicit((device atomic_uint*)&histogram[512 + b], 1, memory_order_relaxed);
+    atomic_fetch_add_explicit((device atomic_uint*)&histogram[HISTOGRAM_BINS + g], 1, memory_order_relaxed);
+    atomic_fetch_add_explicit((device atomic_uint*)&histogram[HISTOGRAM_BINS * 2 + b], 1, memory_order_relaxed);
 }
 
 // ORB Feature Detection
@@ -146,7 +147,7 @@ kernel void compute_phash(texture2d<float, access::read> inputTexture [[texture(
 // Similarity Computation
 kernel void compute_similarity(device const float* featureData [[buffer(0)]],
                               device float* similarityMatrix [[buffer(1)]],
-                              constant int& batchSize [[buffer(2)]],
+                              constant uint& batchSize [[buffer(2)]],
                               uint2 gid [[thread_position_in_grid]]) {
     if (gid.x >= batchSize || gid.y >= batchSize) {
         return;
@@ -164,9 +165,9 @@ kernel void compute_similarity(device const float* featureData [[buffer(0)]],
         return;
     }
     
-    const int histogramSize = 768;
-    const int orbSize = 16000;
-    const int featureSize = histogramSize + orbSize + 1;
+    const int histogramSize = HISTOGRAM_SIZE;  // 使用常量而非硬编码
+    const int orbSize = ORB_FEATURE_COUNT * ORB_DESCRIPTOR_SIZE;  // 使用常量计算
+    const int featureSize = histogramSize + orbSize + 2; // +2 for pHash (stored as 2 floats)
     
     device const float* features1 = &featureData[i * featureSize];
     device const float* features2 = &featureData[j * featureSize];
@@ -235,8 +236,14 @@ kernel void compute_similarity(device const float* featureData [[buffer(0)]],
     orbSim = (validFeatures > 0) ? (orbSim / validFeatures) : 0.0;
     
     // PHash similarity
-    uint64_t pHash1 = as_type<uint64_t>(features1[histogramSize + orbSize]);
-    uint64_t pHash2 = as_type<uint64_t>(features2[histogramSize + orbSize]);
+    // pHash is stored as two consecutive floats (64 bits total)
+    uint32_t pHash1_low = as_type<uint32_t>(features1[histogramSize + orbSize]);
+    uint32_t pHash1_high = as_type<uint32_t>(features1[histogramSize + orbSize + 1]);
+    uint64_t pHash1 = (uint64_t(pHash1_high) << 32) | uint64_t(pHash1_low);
+    
+    uint32_t pHash2_low = as_type<uint32_t>(features2[histogramSize + orbSize]);
+    uint32_t pHash2_high = as_type<uint32_t>(features2[histogramSize + orbSize + 1]);
+    uint64_t pHash2 = (uint64_t(pHash2_high) << 32) | uint64_t(pHash2_low);
     
     uint64_t xorResult = pHash1 ^ pHash2;
     int hammingDistance = popcount(xorResult);

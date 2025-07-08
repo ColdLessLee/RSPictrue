@@ -47,7 +47,7 @@ public struct RSPBatchOperationResult {
 
 
 
-public final class RSPAssetsService {
+public final class RSPAssetsService: NSObject {
     
     // MARK: - Singleton
     public static let shared = RSPAssetsService()
@@ -78,7 +78,8 @@ public final class RSPAssetsService {
     }()
     
     // MARK: - Initialization
-    private init() {
+    private override init() {
+        super.init()
         setupNotifications()
     }
     
@@ -97,20 +98,7 @@ public final class RSPAssetsService {
     
     // MARK: - Setup
     private func setupNotifications() {
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(photoLibraryDidChange),
-            name: .PHPhotoLibraryDidChange,
-            object: nil
-        )
-    }
-    
-    @objc private func photoLibraryDidChange(_ notification: Notification) {
-        // Invalidate cache when photo library changes
-        stateQueue.async { [weak self] in
-            self?.assetCache.removeAll()
-            self?.lastFetchDate.removeAll()
-        }
+        PHPhotoLibrary.shared().register(self)
     }
     
     // MARK: - Public Interface - Asset Fetching
@@ -566,5 +554,15 @@ public final class RSPAssetsService {
     // MARK: - Cleanup
     deinit {
         NotificationCenter.default.removeObserver(self)
+    }
+}
+
+extension RSPAssetsService: PHPhotoLibraryChangeObserver {
+    public func photoLibraryDidChange(_ changeInstance: PHChange) {
+        // Invalidate cache when photo library changes
+        stateQueue.async { [weak self] in
+            self?.assetCache.removeAll()
+            self?.lastFetchDate.removeAll()
+        }
     }
 }

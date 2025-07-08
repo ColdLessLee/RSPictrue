@@ -1,22 +1,10 @@
 import Foundation
 import Photos
+import Metal
 
 // MARK: - Public Interface
 @_exported import Foundation
 @_exported import Photos
-
-// Export main manager
-public typealias RSPictureManager = RSPictureCore.RSPictureManager
-
-// Export delegate protocol
-public typealias RSPictureDelegate = RSPictureCore.RSPictureDelegate
-
-// Export result types
-public typealias ScanProgress = RSPictureCore.ScanProgress
-public typealias SimilarityResult = RSPictureCore.SimilarityResult
-
-// Export error types
-public typealias RSPictureError = RSPictureCore.RSPictureError
 
 // MARK: - Configuration
 public struct RSPictureConfiguration {

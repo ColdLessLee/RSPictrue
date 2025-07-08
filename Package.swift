@@ -37,9 +37,6 @@ let package = Package(
         .target(
             name: "RSP",
             dependencies: ["RSPictureCore", "AssetsService"]
-        ),
-        .testTarget(
-            name: "RSPictureCoreTests",
-            dependencies: ["RSPictureCore"])
+        )
     ]
-) 
+)

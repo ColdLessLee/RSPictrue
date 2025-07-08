@@ -36,9 +36,9 @@ public final class RSPictureManager {
     public static let shared = RSPictureManager()
     
     // MARK: - Properties
-    private let metalProcessor: MetalImageProcessor
-    private let batchProcessor: BatchProcessor
-    private let algorithmProcessor: ImageSimilarityAlgorithms
+    let metalProcessor: MetalImageProcessor
+    let batchProcessor: BatchProcessor
+    let algorithmProcessor: ImageSimilarityAlgorithms
     
     // Thread-safe properties
     private let serialQueue = DispatchQueue(label: "com.rspicture.serial", qos: .userInitiated)
@@ -134,6 +134,49 @@ public final class RSPictureManager {
         }
     }
     
+    // MARK: - Async Interface
+    public func scanSimilarImages(from assets: [PHAsset], delegate: RSPictureDelegate? = nil) async throws -> [SimilarityResult] {
+        setDelegate(delegate)
+        
+        return try await withCheckedThrowingContinuation { continuation in
+            var results: [SimilarityResult] = []
+            var hasCompleted = false
+            
+            // Create a temporary delegate to capture results
+            let tempDelegate = TempScanDelegate { result in
+                results.append(result)
+            } onComplete: { finalResult in
+                results.append(finalResult)
+                if !hasCompleted {
+                    hasCompleted = true
+                    continuation.resume(returning: results)
+                }
+            } onError: { error in
+                if !hasCompleted {
+                    hasCompleted = true
+                    continuation.resume(throwing: error)
+                }
+            }
+            
+            setDelegate(tempDelegate)
+            findSimilarImages(from: assets)
+        }
+    }
+    
+    public func processBatch(_ assets: [PHAsset]) -> AsyncThrowingStream<ScanProgress, Error> {
+        return AsyncThrowingStream { continuation in
+            setDelegate(StreamingDelegate { progress in
+                continuation.yield(progress.progress)
+            } onComplete: { _ in
+                continuation.finish()
+            } onError: { error in
+                continuation.finish(throwing: error)
+            })
+            
+            findSimilarImages(from: assets)
+        }
+    }
+    
     // MARK: - Private Methods
     private func setupCache() {
         imageCache.countLimit = 100
@@ -188,7 +231,7 @@ public final class RSPictureManager {
                     isComplete: batchIndex == batches.count - 1
                 )
                 
-                self?.notifyDelegate { delegate in
+                self.notifyDelegate { delegate in
                     if result.isComplete {
                         delegate.rspictureDidComplete(result)
                     } else {
@@ -204,7 +247,7 @@ public final class RSPictureManager {
         }
     }
     
-    private func processBatch(_ batch: [PHAsset], batchIndex: Int, totalBatches: Int, totalAssets: Int) throws -> [[PHAsset]] {
+    func processBatch(_ batch: [PHAsset], batchIndex: Int, totalBatches: Int, totalAssets: Int) throws -> [[PHAsset]] {
         // Extract image features using Metal
         let features = try metalProcessor.extractBatchFeatures(from: batch, cache: imageCache)
         
@@ -215,7 +258,7 @@ public final class RSPictureManager {
         return groupSimilarAssets(batch: batch, similarities: similarities)
     }
     
-    private func groupSimilarAssets(batch: [PHAsset], similarities: [[Float]]) -> [[PHAsset]] {
+    func groupSimilarAssets(batch: [PHAsset], similarities: [[Float]]) -> [[PHAsset]] {
         var groups: [[PHAsset]] = []
         var visited = Set<Int>()
         
@@ -242,5 +285,62 @@ public final class RSPictureManager {
         }
         
         return groups
+    }
+}
+
+// MARK: - Temporary Delegate Classes for Async Support
+private class TempScanDelegate: RSPictureDelegate {
+    private let onProgress: (SimilarityResult) -> Void
+    private let onComplete: (SimilarityResult) -> Void
+    private let onError: (Error) -> Void
+    
+    init(
+        onProgress: @escaping (SimilarityResult) -> Void,
+        onComplete: @escaping (SimilarityResult) -> Void,
+        onError: @escaping (Error) -> Void
+    ) {
+        self.onProgress = onProgress
+        self.onComplete = onComplete
+        self.onError = onError
+    }
+    
+    func rspictureDidUpdateProgress(_ result: SimilarityResult) {
+        onProgress(result)
+    }
+    
+    func rspictureDidComplete(_ finalResult: SimilarityResult) {
+        onComplete(finalResult)
+    }
+    
+    func rspictureDidEncounterError(_ error: Error) {
+        onError(error)
+    }
+}
+
+private class StreamingDelegate: RSPictureDelegate {
+    private let onProgress: (SimilarityResult) -> Void
+    private let onComplete: (SimilarityResult) -> Void
+    private let onError: (Error) -> Void
+    
+    init(
+        onProgress: @escaping (SimilarityResult) -> Void,
+        onComplete: @escaping (SimilarityResult) -> Void,
+        onError: @escaping (Error) -> Void
+    ) {
+        self.onProgress = onProgress
+        self.onComplete = onComplete
+        self.onError = onError
+    }
+    
+    func rspictureDidUpdateProgress(_ result: SimilarityResult) {
+        onProgress(result)
+    }
+    
+    func rspictureDidComplete(_ finalResult: SimilarityResult) {
+        onComplete(finalResult)
+    }
+    
+    func rspictureDidEncounterError(_ error: Error) {
+        onError(error)
     }
 }

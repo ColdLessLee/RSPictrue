@@ -22,8 +22,10 @@ struct SimilarityMetrics {
 // MARK: - Algorithm Configuration
 struct AlgorithmConfiguration {
     static let histogramBins = 256
+    static let histogramSize = histogramBins * 3  // RGB三通道总直方图大小 (768)
     static let orbFeatureCount = 500
     static let orbDescriptorSize = 32
+    static let orbSize = orbFeatureCount * orbDescriptorSize  // ORB特征总大小 (16000)
     static let pHashSize = 64
     
     // Similarity thresholds
@@ -52,7 +54,6 @@ final class ImageSimilarityAlgorithms {
     // MARK: - Public Interface
     func calculateSimilarities(features: BatchFeatures, using metalProcessor: MetalImageProcessor) throws -> [[Float]] {
         let batchSize = features.batchSize
-        var similarityMatrix = Array(repeating: Array(repeating: Float(0.0), count: batchSize), count: batchSize)
         
         // Use Metal for GPU acceleration when available
         if let metalBuffer = try? metalProcessor.calculateSimilarityMatrix(features: features) {

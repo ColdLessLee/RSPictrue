@@ -40,7 +40,7 @@ public final class RSP {
     /// - Parameter config: 配置参数
     public static func initialize(with config: Config = .default) {
         _configuration = config
-        _coreManager = RSPictureManager()
+        _coreManager = RSPictureManager.shared
         _coreManager?.configure(with: config.coreConfiguration)
         
         // 配置日志系统
@@ -118,6 +118,7 @@ public final class RSP {
     /// 获取所有指定类型的资产
     /// - Parameter mediaType: 媒体类型
     /// - Returns: 资产数组
+    @available(iOS 14.0, *)
     public static func fetchAllAssets(for mediaType: RSPMediaType = .all) async throws -> [PHAsset] {
         return try await withCheckedThrowingContinuation { continuation in
             _assetsService.fetchAllAssets(for: mediaType) { result in
@@ -132,6 +133,7 @@ public final class RSP {
     ///   - offset: 偏移量
     ///   - limit: 限制数量
     /// - Returns: 查询结果
+    @available(iOS 14.0, *)
     public static func fetchAssets(
         for mediaType: RSPMediaType = .all,
         offset: Int = 0,
@@ -147,6 +149,7 @@ public final class RSP {
     /// 通过ID获取资产
     /// - Parameter ids: 资产ID数组
     /// - Returns: 批量操作结果
+    @available(iOS 14.0, *)
     public static func fetchAssets(withIds ids: [String]) async throws -> RSPBatchOperationResult {
         return try await withCheckedThrowingContinuation { continuation in
             _assetsService.fetchAssets(withIds: ids) { result in
@@ -158,6 +161,7 @@ public final class RSP {
     /// 删除资产
     /// - Parameter ids: 资产ID数组
     /// - Returns: 批量操作结果
+    @available(iOS 14.0, *)
     public static func deleteAssets(withIds ids: [String]) async throws -> RSPBatchOperationResult {
         return try await withCheckedThrowingContinuation { continuation in
             _assetsService.deleteAssets(withIds: ids) { result in
@@ -169,6 +173,7 @@ public final class RSP {
     /// 收藏资产
     /// - Parameter ids: 资产ID数组
     /// - Returns: 批量操作结果
+    @available(iOS 14.0, *)
     public static func favoriteAssets(withIds ids: [String]) async throws -> RSPBatchOperationResult {
         return try await withCheckedThrowingContinuation { continuation in
             _assetsService.favoriteAssets(withIds: ids) { result in
@@ -180,6 +185,7 @@ public final class RSP {
     /// 取消收藏资产
     /// - Parameter ids: 资产ID数组
     /// - Returns: 批量操作结果
+    @available(iOS 14.0, *)
     public static func unfavoriteAssets(withIds ids: [String]) async throws -> RSPBatchOperationResult {
         return try await withCheckedThrowingContinuation { continuation in
             _assetsService.unfavoriteAssets(withIds: ids) { result in
@@ -191,6 +197,7 @@ public final class RSP {
     /// 刷新缓存
     /// - Parameter mediaType: 媒体类型
     /// - Returns: 刷新后的资产数组
+    @available(iOS 14.0, *)
     public static func refreshAssets(for mediaType: RSPMediaType = .all) async throws -> [PHAsset] {
         return try await withCheckedThrowingContinuation { continuation in
             _assetsService.refreshAssets(for: mediaType) { result in
@@ -315,7 +322,3 @@ public extension RSP {
     }
 }
 
-// MARK: - Error Extension
-extension RSPictureError {
-    static let notInitialized = RSPictureError.invalidConfiguration
-} 

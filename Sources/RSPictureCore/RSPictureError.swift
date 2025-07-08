@@ -11,6 +11,8 @@ public enum RSPictureError: LocalizedError {
     case batchOperationFailed
     case invalidOffset
     case imageLoadingFailed
+    case invalidConfiguration
+    case notInitialized
     
     public var errorDescription: String? {
         switch self {
@@ -32,6 +34,10 @@ public enum RSPictureError: LocalizedError {
             return "Invalid offset provided for pagination."
         case .imageLoadingFailed:
             return "Failed to load image from asset."
+        case .invalidConfiguration:
+            return "Invalid Configuration"
+        case .notInitialized:
+            return "RSP system has not been initialized. Call RSP.initialize() first."
         }
     }
 } 
