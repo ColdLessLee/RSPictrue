@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
   spec.name          = "RSPicture"
-  spec.version       = "1.0.0"
+  spec.version       = "1.0.2"
   spec.summary       = "A powerful Swift package for image similarity detection and asset management"
   spec.description   = <<-DESC
                        RSPicture is a comprehensive Swift package that provides advanced image similarity 
@@ -27,7 +27,7 @@ Pod::Spec.new do |spec|
   spec.frameworks    = "Foundation", "Photos", "UIKit", "Metal", "MetalKit", "AVFoundation"
   
   # Optional Kingfisher support
-  spec.dependency "Kingfisher", "~> 7.0"
+  spec.dependency "Kingfisher"
   
   # Subspecs for individual components
   spec.subspec 'Core' do |core|
